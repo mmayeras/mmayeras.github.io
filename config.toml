@@ -1,0 +1,10 @@
+baseURL = 'http://mmayeras.github.io'
+languageCode = 'en-us'
+title = "mmayeras's notes"
+theme = 'hugo-theme-learn'
+
+[outputs]
+home = [ "HTML", "RSS", "JSON"]
+
+[params]
+themeVariant = "red"
