@@ -8,3 +8,5 @@ home = [ "HTML", "RSS", "JSON"]
 
 [params]
 themeVariant = "red"
+showvisitedlinks = false
+disableMermaid = true
