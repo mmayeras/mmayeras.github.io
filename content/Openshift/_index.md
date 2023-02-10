@@ -8,7 +8,7 @@ pre = "<b>1. </b>"
 
 ### Openshift
 
-## Quick access to doc
+## Documentation
 
 [docs.openshift.com](https://docs.openshift.com/)
 
