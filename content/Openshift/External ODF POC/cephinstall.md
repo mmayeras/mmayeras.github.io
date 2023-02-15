@@ -87,5 +87,3 @@ $ ssh-copy-id -f -i ~/ceph.pub root@ceph3
 13. Add cephfs, rgw, rbd pools using the web UI
 
 
-14. Install ODF using Operator Hub and create external storage system
-15. 

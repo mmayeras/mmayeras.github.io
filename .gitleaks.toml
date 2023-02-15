@@ -6,6 +6,8 @@
 
     # Ignore htpasswd.md sample file
     '''htpasswd\.md'''
+    # Ignore odfinstall.md sample file
+    '''odfinstall\.md'''
     # Ignore all example certs
     #'''\/example.*\.pem$''',
                 
