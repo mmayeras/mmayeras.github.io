@@ -3,6 +3,7 @@ title = "Flow Collector"
 date = 2023-02-09T12:04:20+01:00
 weight = 4
 chapter = false
+hidden = false
 +++
 
 #### Install Network Oservability operator from Operator Hub
