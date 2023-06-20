@@ -60,7 +60,7 @@ export OCP_WILDCARD_DOMAIN=$(oc get ingresscontroller default -n openshift-ingre
 
 
 
-### Patch ingress to use custom names
+### Patch ingress to use custom names (if needed)
 https://access.redhat.com/solutions/4853401
 
 

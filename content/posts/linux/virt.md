@@ -1,5 +1,5 @@
 ---
-title: "Qemu custsomize"
+title: "Qemu customize"
 date: 2023-04-25
 categories:
 - linux
