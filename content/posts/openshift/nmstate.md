@@ -77,9 +77,12 @@ NodeNetworkConfigurationEnactment : Reports of the NNCP applied
 #### Edit dns search and/or nameservers and add custom routes
 In this example, 3 search are added. The primary interface ens18 is used. Initally configured using dhcp static lease I need to configure the same IP adress and ensure default route is created.
 
-> By default, the manifest applies to all nodes in the cluster. To add the interface to specific nodes, add the spec: nodeSelector parameter and the appropriate <key>:<value> for your node selector.
-> 
->You can configure multiple nmstate-enabled nodes concurrently. The configuration applies to 50% of the nodes in parallel. This strategy prevents the entire cluster from being unavailable if the network connection fails. To apply the policy configuration in parallel to a specific portion of the cluster, use the maxUnavailable field.
+{{< admonition danger "Danger" >}}
+By default, the manifest applies to all nodes in the cluster. To add the interface to specific nodes, add the spec: nodeSelector parameter and the appropriate <key>:<value> for your node selector.
+
+You can configure multiple nmstate-enabled nodes concurrently. The configuration applies to 50% of the nodes in parallel. This strategy prevents the entire cluster from being unavailable if the network connection fails. To apply the policy configuration in parallel to a specific portion of the cluster, use the maxUnavailable field.
+{{< /admonition >}}
+
 
 ```yaml
 apiVersion: nmstate.io/v1
