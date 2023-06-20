@@ -9,7 +9,7 @@ categories:
 
 [Official documentation](https://docs.openshift.com/container-platform/4.11/networking/k8s_nmstate/k8s-nmstate-about-the-k8s-nmstate-operator.html)
 
-### Install operator
+## Install operator
 
 #### Create NS
 
@@ -59,7 +59,7 @@ spec:
   sourceNamespace: openshift-marketplace
 ```
 
-#### Create nmstate instance
+### Create nmstate instance
 ```yaml
 apiVersion: nmstate.io/v1
 kind: NMState
@@ -67,15 +67,19 @@ metadata:
   name: nmstate
 ```
 
-### nmstate resources
+## nmstate resources
 
-NodeNetworkState : Current state of nodes
-NodeNetworkConfigurationPolicy : Desired state of nodes
-NodeNetworkConfigurationEnactment : Reports of the NNCP applied
+**NodeNetworkState** : Current state of nodes
 
-### NNCP definitions
-#### Edit dns search and/or nameservers and add custom routes
-In this example, 3 search are added. The primary interface ens18 is used. Initally configured using dhcp static lease I need to configure the same IP adress and ensure default route is created.
+**NodeNetworkConfigurationPolicy** : Desired state of nodes
+
+**NodeNetworkConfigurationEnactment** : Reports of the NNCP applied
+
+## NNCP definition
+
+### **Edit dns search and/or nameservers and add custom routes**
+
+In this example, 3 search are added. The primary interface ens18 is used. Initally configured using dhcp static lease I need to configure the same IP address and ensure default route is created.
 
 {{< admonition danger "Danger" >}}
 By default, the manifest applies to all nodes in the cluster. To add the interface to specific nodes, add the spec: nodeSelector parameter and the appropriate <key>:<value> for your node selector.
@@ -143,7 +147,7 @@ ens18-custom-dns-and-routes     Available   SuccessfullyConfigur
 $ oc get nnce <nnce_name> -o jsonpath='{.status.conditions[?(@.type=="Failing")].message}'                                            
 ```
 
-Here is an examplemessage example when using an unreachable nameserver :
+Here is an example message when using an unreachable nameserver :
 
 ```
 error reconciling NodeNetworkConfigurationPolicy at desired state apply: ,
@@ -154,7 +158,10 @@ error reconciling NodeNetworkConfigurationPolicy at desired state apply: ,
         i/o timeout]
 ```
 
-**Fix the nncp depending on the error message**
+  {{< admonition warning "Warning" >}}
+    Fix the nncp depending on the error message
+  {{< /admonition >}}
+
 
 
 
