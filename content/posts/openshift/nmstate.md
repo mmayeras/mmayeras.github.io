@@ -163,6 +163,37 @@ error reconciling NodeNetworkConfigurationPolicy at desired state apply: ,
   {{< /admonition >}}
 
 
+### NetworkManager config file result on the node 
+
+
+```ini
+# /etc/NetworkManager/system-connections/ens18.nmconnection
+[connection]
+id=ens18
+uuid=xxxxxxxxxxxxxxxxxxxxxxx
+type=ethernet
+interface-name=ens18
+lldp=0
+
+[ethernet]
+
+[ipv4]
+address1=192.168.0.54/24
+dhcp-client-id=mac
+dhcp-timeout=90
+dns=8.8.8.8;
+dns-priority=40
+dns-search=my-extra-dns1;my-extra-dns2;my-extra-dns3;
+may-fail=false
+method=manual
+route1=172.16.0.0/12,192.168.0.10,150
+route1_options=table=254
+route2=0.0.0.0/0,192.168.0.1,150
+route2_options=table=254
+
+[user]
+nmstate.interface.description=custom dns on ens18 2
+```
 
 
 
