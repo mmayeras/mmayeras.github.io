@@ -48,6 +48,7 @@ systemctl enable tftp.service httpd --now
 
 /var/lib/tftpboot/efi64/pxelinux.cfg/default
 ```
+UI vesamenu.c32
 MENU BACKGROUND        bg-ocp.png  
 MENU COLOR sel         4  #ffffff std 
 MENU COLOR title       1  #ffffff  
