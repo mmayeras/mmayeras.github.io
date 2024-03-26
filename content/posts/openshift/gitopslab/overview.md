@@ -1,7 +1,7 @@
 ---
 title: "Overview"
-date: 2023-06-23
-draft: true
+date: 2024-03-26
+draft: false
 categories:
 - openshift
 tags:
@@ -9,11 +9,8 @@ tags:
 ---
 
 
-_This tutorial explains how to deploy Red Hat OpenShift GitOps and Red Hat Openshift Advanced Cluster Management to manage multiple clusters. Estimated time to complete this tutorial: 1 hour._
+![arch](gitopslab.png)
 
 ### Components overview
 
-This lab uses 2 Openshift Clusters, a GitOps instance is running on each of the clusters and one of them will manage the others with Red hat ACM.
-
-<Insert Schema here>
 
