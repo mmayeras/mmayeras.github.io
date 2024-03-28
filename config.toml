@@ -90,7 +90,8 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
   description = "mika's blog"
   # website images for Open Graph and Twitter Cards
   images = ["/logo.png"]
-  favicon = "/favicon.ico”
+  favicon = "/favicon.ico"
+
   # Header config
   [params.header]
     # desktop header mode ["fixed", "normal", "auto"]
