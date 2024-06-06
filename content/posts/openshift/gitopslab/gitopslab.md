@@ -141,7 +141,7 @@ The demo assets are available in these repositories :
   The main repository to deploy and configure the operators
 - [new-ee-demo](https://github.com/mmayeras/new-ee-demo)    
   A sample repo to store execution environement specs configured with a webhook to be built through our pipeline
-- [openshift-pipelines-aap-playbooks][(https://github.com](https://github.com/mmayeras/openshift-pipelines-aap-playbooks))    
+- [openshift-pipelines-aap-playbooks](https://github.com](https://github.com/mmayeras/openshift-pipelines-aap-playbooks))    
   Some playbooks example 
 
 
