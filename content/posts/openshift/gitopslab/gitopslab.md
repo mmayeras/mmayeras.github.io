@@ -135,7 +135,7 @@ Automatic steps
 {{< /admonition >}}
 
 
-The required is available in these repositories :
+The demo assets are available in these repositories :
 
 - [openshift-pipelines-aap-ee](https://github.com/mmayeras/openshift-pipelines-aap-ee)  
   The main repository to deploy and configure the operators
