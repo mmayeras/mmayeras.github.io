@@ -147,7 +147,7 @@ The demo assets are available in these repositories :
 
 #### Openshift GitOps Operator Installation
 
-1. Clone or fork [gitops-ansible-ee-demo-assets](https://github.com) 
+1. Clone or fork [openshift-pipelines-aap-ee](https://github.com) 
 2. Apply the kustomization file for Openshift GitOps  
 ```shell
 $ oc apply -k 0-init/0-gitops 
