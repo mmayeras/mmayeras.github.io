@@ -137,11 +137,11 @@ Automatic steps
 
 The required is available in these repositories :
 
-- [gitops-ansible-ee-demo-assets](https://github.com)  
+- [openshift-pipelines-aap-ee](https://github.com/mmayeras/openshift-pipelines-aap-ee)  
   The main repository to deploy and configure the operators
-- [gitops-ansible-ee-demo-executionenvironment](https://github.com)    
+- [new-ee-demo](https://github.com/mmayeras/new-ee-demo)    
   A sample repo to store execution environement specs configured with a webhook to be built through our pipeline
-- [gitops-ansible-ee-demo-playbooks](https://github.com)    
+- [openshift-pipelines-aap-playbooks][(https://github.com](https://github.com/mmayeras/openshift-pipelines-aap-playbooks))    
   Some playbooks example 
 
 
