@@ -288,13 +288,19 @@ and the previously created github-trigger-secret.
   Sealed secrets has to be created with your sealed secret key. This is not covered in this lab. [Refer to Sealed secrets documentation](https://github.com/bitnami-labs/sealed-secrets)
 {{< /admonition >}}
 
+### Run your pipeline
+
 See https://github.com/mmayeras/new-ee-demo.git for an example.
 
 In this configuration, I am uploading my execution-environement images on quay.io where the destination images name will be :
 
-quay.io/rh_ee_$(tt.params.reponame)
+ <i> quay.io/rh_ee_$(tt.params.reponame) </i>
 
-The full reponame (configured in 2-trigger-binding.yaml) is for example mmayeras/demo-ee.
+The full reponame (configured in 2-trigger-binding.yaml) is for example mmayeras/new-ee-demo.
+
+Each new push event will trigger the a PipelineRun and the new EE image will be push into quay.io.
+
+Enjoy!
 
 
 
