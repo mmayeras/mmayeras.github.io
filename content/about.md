@@ -29,7 +29,7 @@ description: "About Me"
 
 ##### Red Hat Certifications
 
-Always seeking challenges and learning opportunities, I have obtained some certififactions during my career.
+Always seeking challenges and learning opportunities, I have obtained some certifications during my career.
 
 <img class="special-img-class" style="width:80%" src="/images/certs.png" />
 
