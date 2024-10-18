@@ -16,7 +16,7 @@ description: "About Me"
 
   
 
-##### Currently I am working as a **Technical Account Manger for Red Hat**, focused in **OpenShift** and **Automation**, helping the customers to achieve their goals and objectives with Red hat portfolio.  
+##### Currently working as a **Technical Account Manger for Red Hat**, focused in **OpenShift** and **Automation**, helping the customers to achieve their goals and objectives with Red hat portfolio.  
 
   
 
@@ -29,7 +29,7 @@ description: "About Me"
 
 ##### Red Hat Certifications
 
-Always seeking challenges and learning opportunities, I have obtained some certitifactions during my career.
+Always seeking challenges and learning opportunities, I have obtained some certififactions during my career.
 
 <img class="special-img-class" style="width:80%" src="/images/certs.png" />
 
