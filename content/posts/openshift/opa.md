@@ -290,4 +290,37 @@ deployment.apps/ubi9 restarted
 The pod starts well.
 
 
+Alternatively, the same can be achieved at the Deployment and/or ReplicaSet level by extending the violations list in the constraint template :
 
+
+```yaml
+violation[{"msg": msg}] {
+        container := input.review.object.spec.template.spec.containers[_]
+        image := container.image
+        startswith(image, input.parameters.repos[_])
+        msg := sprintf("container <%v> has an invalid image repo <%v>", [container.name, container.image])
+      }
+```
+
+and the resource kinds in the constraint :
+
+
+```yaml
+spec:
+  match:
+    kinds:
+    - apiGroups:
+      - ""
+      kinds:
+      - Pod
+      - ReplicationController
+      - Service
+    - apiGroups:
+      - apps
+      kinds:
+      - DaemonSet
+      - Deployment
+      - Job
+      - ReplicaSet
+      - StatefulSet
+```
