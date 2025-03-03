@@ -125,6 +125,7 @@ status: {}
 
 
 #### 4. Create the cluster installation files
+##### Option 1 : Boot from ISO
 
 Edit the following files with your values
 
@@ -220,6 +221,46 @@ $ cp install-config.yaml agent-config.yaml install_dir/
 $ ./openshift-install agent create image --dir install_dir/
 ```
 
+##### Option 2 : PXE Boot
+
+dnsmasq configuration for ipxe
+
+```
+user=dnsmasq
+group=dnsmasq
+interface=eth1
+interface=lo
+bind-interfaces
+addn-hosts=/etc/mmayeras.local.ocpv.hosts
+expand-hosts
+domain=mmayeras.local.ocpv
+dhcp-range=192.168.100.100,192.168.100.150,255.255.255.0,12h
+dhcp-option=3
+dhcp-option=option:dns-server,192.168.100.1
+dhcp-boot=agent.x86_64.ipxe
+pxe-prompt="PXE Booting in", 5
+pxe-service=X86PC, "Boot from network", agent.x86_64.ipxe
+enable-tftp
+tftp-root=/var/lib/tftpboot
+conf-dir=/etc/dnsmasq.d,.rpmnew,.rpmsave,.rpmorig
+```
+
+Add bootArtifactsBaseURL in the agent-config.yaml
+
+bootArtifactsBaseURL: http://192.168.100.1/
+
+Create the PXE files
+
+```shell
+$ mkdir install_dir
+$ cp install-config.yaml agent-config.yaml install_dir/
+$ ./openshift-install agent create pxe-files --dir install_dir/
+```
+
+Copy the ipxe file in /var/lib/tftpboot and initrd, rootfs, vmlinuz in /var/www/html/
+
+
+
 #### 5. Build the Openshift Cluster
 
 
@@ -314,12 +355,12 @@ spec:
           disks:
           - bootOrder: 2
             name: rootdisk
-          - bootOrder: 1
+          - bootOrder: 1 # Delete this device if using PXE
             cdrom:
               bus: sata
             name: <my-dv>
           interfaces:
-          - bootOrder: 3
+          - bootOrder: 3 #Change bootorder if using PXE
             bridge: {}
             macAddress: 02:a1:3b:00:00:56 #MAC Address used in agent-config.yaml
             model: virtio
@@ -334,10 +375,11 @@ spec:
       - dataVolume:
           name: my-sno-vm-volume-blank
         name: rootdisk
-      - name: <my-dv>
+      - name: <my-dv>  # Delete this device if using PXE
         persistentVolumeClaim:
           claimName: <my-dv> #Volume name used in the virtcrl upload command
 ```
+
 
 Installation will begin, you can monitor using the VM console from Openshift or with openshift-install
 
