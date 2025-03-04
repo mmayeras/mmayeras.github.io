@@ -221,6 +221,13 @@ $ cp install-config.yaml agent-config.yaml install_dir/
 $ ./openshift-install agent create image --dir install_dir/
 ```
 
+**Create a bootable datavolume**
+
+```shell
+$ oc new-project mysno
+$ ./virtctl image-upload dv <my-dv> --size=2G --image-path=install_dir/agent.x86_64.iso --insecure
+```
+
 ##### Option 2 : PXE Boot
 
 dnsmasq configuration for ipxe
@@ -249,7 +256,7 @@ Add bootArtifactsBaseURL in the agent-config.yaml
 
 bootArtifactsBaseURL: http://192.168.100.1/
 
-Create the PXE files
+**Create the PXE files**
 
 ```shell
 $ mkdir install_dir
@@ -269,12 +276,6 @@ Copy the ipxe file in /var/lib/tftpboot and initrd, rootfs, vmlinuz in /var/www/
 {{< /admonition >}}
 
 
-
-Create a bootable datavolume
-```shell
-$ oc new-project mysno
-$ ./virtctl image-upload dv <my-dv> --size=2G --image-path=install_dir/agent.x86_64.iso --insecure
-````
 
 NNCP and NAD specs
 
@@ -310,7 +311,14 @@ spec:
 ```
 
 
-Create a new VM
+**Create a new VM**
+
+{{< admonition info >}}
+  The rootdisk is blank so the first boot will try to boot on ISO or over PXE to start the install, the next reboot will fallback on the rootdisk, this is what we want.
+{{< /admonition >}}
+
+
+##### Option 1 : Boot from ISO
 
 ```yaml
 apiVersion: kubevirt.io/v1
@@ -350,18 +358,21 @@ spec:
               secretName: <your_pubkey_secret>
       architecture: amd64
       domain:
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
         devices:
           autoattachPodInterface: false
           disks:
-          - bootOrder: 2
-            name: rootdisk
-          - bootOrder: 1 # Delete this device if using PXE
-            cdrom:
+          - name: rootdisk
+            disk:
+              bus: virtio
+          - cdrom:
               bus: sata
             name: <my-dv>
           interfaces:
-          - bootOrder: 3 #Change bootorder if using PXE
-            bridge: {}
+          - bridge: {}
             macAddress: 02:a1:3b:00:00:56 #MAC Address used in agent-config.yaml
             model: virtio
             name: <private_nic-Name>
@@ -375,9 +386,77 @@ spec:
       - dataVolume:
           name: my-sno-vm-volume-blank
         name: rootdisk
-      - name: <my-dv>  # Delete this device if using PXE
+      - name: <my-dv>  
         persistentVolumeClaim:
           claimName: <my-dv> #Volume name used in the virtcrl upload command
+```
+
+##### Option 1 : PXE Boot
+
+```yaml
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:  
+  name: my-sno-vm
+  namespace: mysno
+spec:
+  dataVolumeTemplates:
+  - metadata:
+      creationTimestamp: null
+      name:  my-sno-vm-volume-blank
+    spec:
+      source:
+        blank: {}
+      storage:
+        resources:
+          requests:
+            storage: 150Gi
+        storageClassName: ocs-storagecluster-ceph-rbd-virtualization
+  instancetype:
+    kind: VirtualMachineClusterInstancetype
+    name: u1.2xlarge
+  running: true
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        network.kubevirt.io/headlessService: headless
+    spec:
+      accessCredentials:
+      - sshPublicKey:
+          propagationMethod:
+            noCloud: {}
+          source:
+            secret:
+              secretName: <your_pubkey_secret>
+      architecture: amd64
+      domain:
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
+        devices:
+          autoattachPodInterface: false
+          disks:
+          - name: rootdisk
+            disk:
+              bus: virtio
+          interfaces:
+          - bridge: {}
+            macAddress: 02:a1:3b:00:00:56 #MAC Address used in agent-config.yaml
+            model: virtio
+            name: <private_nic-Name>
+        resources: {}
+      networks:
+      - multus:
+          networkName: default/br1-private #Private Network name, see available NAD 
+        name: <private_nic-Name>
+      subdomain: headless
+      volumes:
+      - dataVolume:
+          name: my-sno-vm-volume-blank
+        name: rootdisk
+
 ```
 
 
