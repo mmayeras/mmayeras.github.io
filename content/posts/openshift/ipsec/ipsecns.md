@@ -76,7 +76,7 @@ openssl pkcs12 -export -out certs/hosts.p12 -inkey private/hosts.key.pem -in cer
 ipsec initnss
 ipsec import certs/hosts.p12
 
-# Verify import if successfull with the name provided ; here "allnodes"
+# Verify import is successfull with the name provided ; here "allnodes"
 certutil -L -d sql:/var/lib/ipsec/nss/
 Certificate Nickname                                         Trust Attributes
                                                              SSL,S/MIME,JAR/XPI
@@ -95,7 +95,7 @@ conn my-host-to-host-vpn
     left=10.8.109.144 #  CAHNGEME This is the RHEL node IP
     leftid=%fromcert
     leftcert="allnodes"    
-    right=10.8.51.222 # CHANGEM This the OCP node IP
+    right=10.8.51.222 # CHANGEME This is the OCP node IP
     rightid=%fromcert
     authby=rsasig              
     ikev2=yes
@@ -114,7 +114,7 @@ systemctl start ipsec.service
 ```
 
 
-### Configration OCP side
+### Configuration OCP side
 
 
 
@@ -159,7 +159,7 @@ oc apply -f ipsec_nncp.yaml
 ```
 
 
-#### Machine config for certificate importation
+#### Machine config for certificate import
 
 ```
 cat > 99-ipsec-worker-endpoint-config.bu << EOF
@@ -216,7 +216,7 @@ oc apply -f
 ``` 
 
 {{< admonition warning >}}
-  Ensure thne name used in the certutil command match the name used in the openssl pkcs12 -export command used previsouly 
+  Ensure thne name used in the certutil command matches the name used in the openssl pkcs12 -export command used previously 
 {{< /admonition >}}
 
 {{< admonition >}}
@@ -265,12 +265,12 @@ ipsec auto --status
 #### Verify with a packet capture
 
 
-Run a tcpdump capture on one of the nodes (OCP node or RHEL node) 
 
 {{< admonition >}}
-  The Encapsulation Security Payload (ESP) is defined in [RFC 4303](https://datatracker.ietf.org/doc/html/rfc4303), has IP protocol number 50
+  The Encapsulation Security Payload (ESP) defined in [RFC 4303](https://datatracker.ietf.org/doc/html/rfc4303) has IP protocol number 50
 {{< /admonition >}}
 
+Run a tcpdump capture on one of the nodes (OCP node or RHEL node) 
 Then ping from node to the other
 
 ```
