@@ -1,6 +1,6 @@
 ---
 title: "Openshift IPSEC N/S"
-date: 2025-6-17
+date: 2025-06-17
 tags:
 - openshift
 categories:
