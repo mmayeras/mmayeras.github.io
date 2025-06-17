@@ -268,7 +268,7 @@ ipsec auto --status
 Run a tcpdump capture on one of the nodes (OCP node or RHEL node) 
 
 {{< admonition >}}
-  The Encapsulation Security Payload (ESP) is defined in RFC 4303, has IP protocol number 50
+  The Encapsulation Security Payload (ESP) is defined in [RFC 4303](https://datatracker.ietf.org/doc/html/rfc4303), has IP protocol number 50
 {{< /admonition >}}
 
 Then ping from node to the other
