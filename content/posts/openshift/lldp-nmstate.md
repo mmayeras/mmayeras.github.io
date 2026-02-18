@@ -1,6 +1,6 @@
 ---
 title: "Enable LLDP on OpenShift nodes using nmstate"
-date: 2025-02-18
+date: 2026-02-18
 draft: false
 categories:
 - openshift
