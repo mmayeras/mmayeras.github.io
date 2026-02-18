@@ -212,7 +212,7 @@ $ oc apply -k 1-apps/2-aap-integration
 Once again, sealed secret used in this example, you can create the secret manually following these specs :
 
 ```yaml
-----
+---
 apiVersion: v1
 data:
   host: <AAC_ROUTE>
