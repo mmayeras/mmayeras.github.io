@@ -15,6 +15,10 @@ toc:
 
 Build an installable ISO from a [RHEL image mode](https://developers.redhat.com/products/rhel-image-mode/overview) container using [bootc-image-builder](https://github.com/osbuild/bootc-image-builder). The resulting ISO installs a system whose root filesystem is managed as an OCI container image — no traditional RPM package manager required post-install.
 
+{{< admonition warning >}}
+All placeholders in angle brackets — `<your-password>`, `<your-ssh-public-key>`, `<registry-token>`, `<your-org>`, `<server-ip>`, etc. — must be replaced with values matching the target environment before running any command or applying any manifest.
+{{< /admonition >}}
+
 ## Prerequisites
 
 - A RHEL subscription with access to `registry.redhat.io`.
@@ -208,7 +212,18 @@ Kickstart automates the installation and is compatible with ISO, PXE, and USB bo
 Create a kickstart file:
 
 ```bash
-cat > bootc.ks <<'EOF'
+cat > bootc.ks <<'KSEOF'
+%pre
+mkdir -p /etc/ostree
+cat > /etc/ostree/auth.json << 'EOF'
+{
+  "auths": {
+    "quay.io": { "auth": "<base64-encoded>" }
+  }
+}
+EOF
+%end
+
 text
 network --bootproto=dhcp --device=link --activate
 
@@ -229,28 +244,45 @@ sshkey --username cloud-user "<your-ssh-public-key>"
 
 rootpw --iscrypted locked
 reboot
-EOF
+KSEOF
 ```
 
-**Method 1 — serve via HTTP:** Host the file on any HTTP server and pass its URL as a kernel argument at boot:
+**Method 1 — RHEL Network Install ISO + kickstart URL:** Download the [RHEL Network Install ISO](https://access.redhat.com/downloads/content/rhel) for the target architecture. Host the kickstart file on any HTTP server:
 
 ```bash
 python -m http.server 8080
 ```
 
-At the installer boot menu, append the following to the kernel command line and press `Ctrl-X`:
+Boot the target host from the Network Install ISO. At the boot menu, append the following to the kernel command line and press `Ctrl-X`:
 
 ```
 inst.ks=http://<server-ip>:8080/bootc.ks
 ```
 
-**Method 2 — RHEL boot ISO + kickstart URL:** Download the [RHEL Boot ISO](https://access.redhat.com/downloads/content/rhel) (the small netboot image, not the full DVD) for the target architecture. Boot the target host from it, then append the kickstart URL to the kernel command line at the boot menu:
+The installer fetches the kickstart over the network, pulls the container image from the registry via `ostreecontainer`, and completes the installation unattended.
 
-```
-inst.ks=http://<server-ip>:8080/bootc.ks
+**Method 2 — embed kickstart into the ISO with mkksiso:** `mkksiso` (from the `lorax` package) bakes the kickstart directly into the boot ISO so no HTTP server is required. Install `lorax` first:
+
+```bash
+sudo dnf install -y lorax
 ```
 
-Press `Ctrl-X` to boot. The installer fetches the kickstart over the network, pulls the container image from the registry via `ostreecontainer`, and completes the installation unattended. The installed system boots directly from the container image layers and can be updated atomically with `bootc update`.
+Embed the kickstart into the bootc ISO generated in step 4:
+
+```bash
+mkksiso --ks bootc.ks ~/Downloads/rhel-10.1-x86_64-boot.iso output/bootimage-ks.iso
+```
+
+Boot from `output/bootimage-ks.iso`. The kickstart runs automatically with no interactive input — the installer pulls the container image from the registry and completes the installation unattended. The installed system boots directly from the container image layers and can be updated atomically with `bootc upgrade`.
+
+{{< admonition tip >}}
+To serve the kickstart from an HTTP server instead of embedding it, use `--cmdline` to bake the kernel argument into the ISO.
+
+```bash
+mkksiso --cmdline "inst.ks=http://<server-ip>:8080/bootc.ks" \
+  ~/Downloads/rhel-10.1-x86_64-boot.iso output/bootimage-ks.iso
+```
+{{< /admonition >}}
 
 ### Option D: QEMU / KVM (qcow2)
 
@@ -285,7 +317,7 @@ virt-install \
   --os-variant rhel10.0
 ```
 
-The VM boots directly into the installed system. Updates are applied atomically from the registry with `bootc update`.
+The VM boots directly into the installed system. Updates are applied atomically from the registry with `bootc upgrade`.
 
 ## 5. Customize the Image
 

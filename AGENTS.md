@@ -10,7 +10,7 @@
 
 | Field        | Value                                      |
 |--------------|--------------------------------------------|
-| Engine       | Hugo 0.124.0 + LoveIt theme 0.3.0          |
+| Engine       | Hugo 0.157.0 + LoveIt theme 0.3.x          |
 | Author       | Mickael Mayeras (`mika`)                   |
 | License      | CC BY-NC 4.0                               |
 | Language     | English (technical EN, not marketing EN)   |
