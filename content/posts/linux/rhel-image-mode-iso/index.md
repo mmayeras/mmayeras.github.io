@@ -319,6 +319,207 @@ virt-install \
 
 The VM boots directly into the installed system. Updates are applied atomically from the registry with `bootc upgrade`.
 
+### Option E: OpenShift Virtualization (DataVolume import)
+
+[OpenShift Virtualization](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/virtualization/index) can import the `qcow2` image produced in Option D directly into a **DataVolume** via the [Containerized Data Importer (CDI)](https://github.com/kubevirt/containerized-data-importer).
+
+Prerequisites:
+
+- The **OpenShift Virtualization** operator is installed.
+- `oc` and `virtctl` available in `$PATH`.
+- The `qcow2` image is accessible over HTTP or uploaded via `virtctl`.
+
+**Method 1 — upload with virtctl:**
+
+```bash
+virtctl image-upload dv bootc-disk \
+  --size=20Gi \
+  --image-path=output/qcow2/disk.qcow2 \
+  --storage-class=<storage-class> \
+  --namespace=<namespace> \
+  --insecure
+```
+
+**Method 2 — DataVolume manifest with HTTP source:**
+
+Serve the qcow2 from any HTTP server first:
+
+```bash
+python -m http.server 8080 --directory output/qcow2
+```
+
+Then apply the **DataVolume**:
+
+```yaml
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: bootc-disk
+  namespace: <namespace>
+spec:
+  source:
+    http:
+      url: "http://<server-ip>:8080/disk.qcow2"
+  storage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+    storageClassName: <storage-class>
+```
+
+Once the DataVolume reaches `Succeeded` phase, create the **VirtualMachine**:
+
+```yaml
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: bootc-vm
+  namespace: <namespace>
+spec:
+  instancetype:
+    kind: VirtualMachineClusterInstancetype
+    name: u1.medium
+  runStrategy: RerunOnFailure
+  template:
+    metadata:
+      labels:
+        app: bootc-vm
+    spec:
+      architecture: amd64
+      domain:
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
+        devices:
+          disks:
+            - name: rootdisk
+              disk:
+                bus: virtio
+          interfaces:
+            - name: default
+              masquerade: {}
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: rootdisk
+          dataVolume:
+            name: bootc-disk
+```
+
+```bash
+oc apply -f datavolume.yaml
+oc wait dv bootc-disk --for condition=Ready --timeout=10m -n <namespace>
+oc apply -f virtualmachine.yaml
+```
+
+The VM boots from the imported bootc disk. Day-2 updates are applied inside the VM with `bootc upgrade` as with any other deployment method.
+
+### Option F: OpenShift Virtualization — ISO + Kickstart install
+
+Rather than pre-importing a disk image, boot a VM directly from the bootc ISO (generated in step 4) and run the kickstart installer inside OpenShift Virtualization.
+
+Upload the ISO to a DataVolume first:
+
+```bash
+virtctl image-upload dv bootc-iso \
+  --size=5Gi \
+  --image-path=output/bootimage.iso \
+  --storage-class=<storage-class> \
+  --namespace=<namespace> \
+  --insecure
+```
+
+Create a blank DataVolume for the target disk:
+
+```yaml
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: bootc-rootdisk
+  namespace: <namespace>
+spec:
+  source:
+    blank: {}
+  storage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+    storageClassName: <storage-class>
+```
+
+Create the **VirtualMachine**, attaching the ISO as a CD-ROM and the blank PVC as the install target:
+
+```yaml
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: bootc-installer
+  namespace: <namespace>
+spec:
+  instancetype:
+    kind: VirtualMachineClusterInstancetype
+    name: u1.medium
+  running: true
+  template:
+    metadata:
+      labels:
+        app: bootc-installer
+    spec:
+      architecture: amd64
+      domain:
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
+        devices:
+          disks:
+            - name: rootdisk
+              disk:
+                bus: virtio
+              bootOrder: 2
+            - name: installiso
+              cdrom:
+                bus: sata
+                readonly: true
+              bootOrder: 1
+          interfaces:
+            - name: default
+              masquerade: {}
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: rootdisk
+          dataVolume:
+            name: bootc-rootdisk
+        - name: installiso
+          dataVolume:
+            name: bootc-iso
+```
+
+```bash
+oc apply -f blank-dv.yaml
+oc apply -f vm-installer.yaml
+```
+
+The VM boots from the ISO (`bootOrder: 1`). If using a kickstart embedded with `mkksiso` (Option C — Method 2), the installation runs unattended. If using a plain ISO, pass the kickstart URL at the boot menu via the VM console:
+
+```
+inst.ks=http://<server-ip>:8080/bootc.ks
+```
+
+Once installation completes the VM reboots from the disk (`bootOrder: 2`). Remove the ISO DataVolume and detach the CD-ROM after first boot:
+
+```bash
+oc delete dv bootc-iso -n <namespace>
+```
+
 ## 5. Customize the Image
 
 Add packages, files, or systemd units to the `Containerfile` and rebuild. The secret mount must be carried over in every build that installs or modifies files requiring registry access. For example, to install `vim` :
