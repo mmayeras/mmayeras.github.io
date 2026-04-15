@@ -522,7 +522,11 @@ oc delete dv bootc-iso -n <namespace>
 
 ## 5. Customize the Image
 
-Add packages, files, or systemd units to the `Containerfile` and rebuild. The secret mount must be carried over in every build that installs or modifies files requiring registry access. For example, to install `vim` :
+Two approaches are available depending on the use case.
+
+### Option A: Rebuild from the base image
+
+Modify the `Containerfile` from scratch when changes affect the base OS, the pull secret, or the `tmpfiles.d` setup. The secret mount must be carried over in every build:
 
 ```dockerfile
 FROM registry.redhat.io/rhel10/rhel-bootc:10.1
@@ -535,6 +539,21 @@ COPY bootc-auth.conf /usr/lib/tmpfiles.d/bootc-auth.conf
 
 RUN dnf install -y vim-enhanced && dnf clean all
 ```
+
+### Option B: Layer on top of an already-built image
+
+Use the previously published image as the `FROM` base to add packages, configs, or files without touching the base OS or secret setup. This is faster to build and produces a smaller diff layer:
+
+```dockerfile
+FROM quay.io/<your-org>/bootc:v1
+
+RUN dnf install -y vim htop && dnf clean all
+COPY myconfig /etc/myapp/config.yaml
+```
+
+{{< admonition note >}}
+The pull secret and `tmpfiles.d` symlink are already baked into `v1`. No need to repeat the `--mount=type=secret` step unless the credentials themselves need to change.
+{{< /admonition >}}
 
 Tag the new build as a separate version to keep the previous image available as a rollback target:
 
