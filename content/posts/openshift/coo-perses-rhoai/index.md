@@ -90,11 +90,6 @@ EOF
 The dashboard's `$namespace` variable queries `kube_namespace_labels` with `label_opendatahub_io_dashboard="true"` to enumerate ODH-owned projects. That metric is only available on the platform Prometheus (`openshift-monitoring`). If Perses is configured with a single UWM datasource, switch to the fallback matcher `kube_pod_labels{label_notebook_name!=""}` defined in the dashboard's variable comments.
 {{< /admonition >}}
 
-Wait for the plugin pod:
-
-```bash
-oc rollout status deployment/perses -n openshift-operators
-```
 
 ## 4. Apply the PersesDashboard
 
