@@ -29,7 +29,7 @@ Each node receives a dedicated subnet of size `/hostPrefix` from the `clusterNet
 |-------|---------|
 | Max nodes | `2^(hostPrefix − clusterPrefix)` |
 | Pod IPs per node | `2^(32 − hostPrefix) − 2` |
-| Total pod capacity | `Max nodes × Pod IPs per node` |
+| Max routable pod IPs | `Max nodes × Pod IPs per node` |
 
 {{< admonition note >}}
 `hostPrefix` must always be **greater than** the cluster CIDR prefix (a larger number = smaller subnet). Values below `/25` per node are unusual in production — Kubernetes itself consumes several IPs per node (kube-proxy, host-network pods, etc.).
@@ -47,7 +47,7 @@ networking:
   networkType: OVNKubernetes
 ```
 
-This gives: **512 max nodes** × **510 pods/node** = ~261,120 total pod slots.
+This gives: **512 max nodes** × **510 routable IPs/node** = ~261,120 max routable pod IPs across the cluster.
 
 ---
 
@@ -55,8 +55,12 @@ This gives: **512 max nodes** × **510 pods/node** = ~261,120 total pod slots.
 
 ### Cluster CIDR /14  (default — 262,144 total IPs)
 
-| hostPrefix | Max nodes | Pod IPs/node | Total pod slots | Typical use case |
-|:----------:|:---------:|:------------:|:---------------:|------------------|
+{{< admonition note >}}
+**Max routable pod IPs** is the total number of IP addresses available for pods across the cluster (`max nodes × pod IPs per node`). It is a hard network ceiling — resource limits (CPU/memory) and Kubernetes internal overhead will exhaust capacity well before this number is reached in practice.
+{{< /admonition >}}
+
+| hostPrefix | Max nodes | Pod IPs/node | Max routable pod IPs | Typical use case |
+|:----------:|:---------:|:------------:|:--------------------:|------------------|
 | /23 | 512 | 510 | 261,120 | **OCP default** — large clusters |
 | /24 | 1,024 | 254 | 260,096 | Many nodes, moderate pod density |
 | /25 | 2,048 | 126 | 258,048 | Very many nodes, low pod density |
@@ -64,8 +68,8 @@ This gives: **512 max nodes** × **510 pods/node** = ~261,120 total pod slots.
 
 ### Cluster CIDR /16  (65,536 total IPs)
 
-| hostPrefix | Max nodes | Pod IPs/node | Total pod slots | Typical use case |
-|:----------:|:---------:|:------------:|:---------------:|------------------|
+| hostPrefix | Max nodes | Pod IPs/node | Max routable pod IPs | Typical use case |
+|:----------:|:---------:|:------------:|:--------------------:|------------------|
 | /23 | 128 | 510 | 65,280 | Medium cluster, high pod density |
 | /24 | 256 | 254 | 65,024 | Medium cluster, balanced |
 | /25 | 512 | 126 | 64,512 | Many small nodes |
@@ -73,8 +77,8 @@ This gives: **512 max nodes** × **510 pods/node** = ~261,120 total pod slots.
 
 ### Cluster CIDR /18  (16,384 total IPs)
 
-| hostPrefix | Max nodes | Pod IPs/node | Total pod slots | Typical use case |
-|:----------:|:---------:|:------------:|:---------------:|------------------|
+| hostPrefix | Max nodes | Pod IPs/node | Max routable pod IPs | Typical use case |
+|:----------:|:---------:|:------------:|:--------------------:|------------------|
 | /23 | 32 | 510 | 16,320 | Small cluster, high pod density |
 | /24 | 64 | 254 | 16,256 | Small cluster, balanced |
 | /25 | 128 | 126 | 16,128 | Compact cluster, many nodes |
@@ -82,8 +86,8 @@ This gives: **512 max nodes** × **510 pods/node** = ~261,120 total pod slots.
 
 ### Cluster CIDR /20  (4,096 total IPs)
 
-| hostPrefix | Max nodes | Pod IPs/node | Total pod slots | Typical use case |
-|:----------:|:---------:|:------------:|:---------------:|------------------|
+| hostPrefix | Max nodes | Pod IPs/node | Max routable pod IPs | Typical use case |
+|:----------:|:---------:|:------------:|:--------------------:|------------------|
 | /23 | 8 | 510 | 4,080 | Minimal cluster, dense pods |
 | /24 | 16 | 254 | 4,064 | Dev / lab cluster |
 | /25 | 32 | 126 | 4,032 | SNO + workers, low density |
@@ -91,8 +95,8 @@ This gives: **512 max nodes** × **510 pods/node** = ~261,120 total pod slots.
 
 ### Cluster CIDR /22  (1,024 total IPs)
 
-| hostPrefix | Max nodes | Pod IPs/node | Total pod slots | Typical use case |
-|:----------:|:---------:|:------------:|:---------------:|------------------|
+| hostPrefix | Max nodes | Pod IPs/node | Max routable pod IPs | Typical use case |
+|:----------:|:---------:|:------------:|:--------------------:|------------------|
 | /24 | 4 | 254 | 1,016 | SNO or 3-node compact |
 | /25 | 8 | 126 | 1,008 | Compact + a few workers |
 | /26 | 16 | 62 | 992 | Very small lab |
