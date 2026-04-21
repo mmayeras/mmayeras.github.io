@@ -47,7 +47,7 @@ oc rollout status statefulset/prometheus-user-workload -n openshift-user-workloa
 
 ## 2. Install the Cluster Observability Operator
 
-Create a **Subscription** in `openshift-operators` to pull COO from the `redhat-operators` catalog:
+Create a **Subscription** in `openshift-cluster-observability-operator` to pull COO from the `redhat-operators` catalog:
 
 ```bash
 cat <<EOF | oc apply -f -
@@ -55,7 +55,7 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
   name: cluster-observability-operator
-  namespace: openshift-operators
+  namespace: openshift-cluster-observability-operator
 spec:
   channel: development <!-- VERIFY: confirm channel name in OperatorHub -->
   installPlanApproval: Automatic
@@ -68,7 +68,7 @@ EOF
 Confirm the operator pod reaches `Running`:
 
 ```bash
-oc get pods -n openshift-operators -l app.kubernetes.io/name=observability-operator
+oc get pods -n openshift-cluster-observability-operator -l app.kubernetes.io/name=observability-operator
 ```
 
 ## 3. Enable the Perses UI plugin
