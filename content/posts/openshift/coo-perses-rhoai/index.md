@@ -80,7 +80,7 @@ cat <<EOF | oc apply -f -
 apiVersion: observability.openshift.io/v1alpha1
 kind: UIPlugin
 metadata:
-  name: perses
+  name: dashboards
 spec:
   type: Dashboards
 EOF
